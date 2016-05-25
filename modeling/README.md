@@ -1,2 +1,2 @@
 # Seizure-Waves
-Analysis and modeling code for waves of seizure activity.
+Run the function <b>run_seizing_cortical_field.m</b> to generate simulation of seizure.
