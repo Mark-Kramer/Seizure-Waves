@@ -9,4 +9,6 @@ The folder `analysis` contains MATLAB code to estimate the direction and speed o
 
 The folder `modeling` contains MATLAB code to simulate the spatiotemporal dynamics of seizure on a two-dimensional surface.
 
+The folder `data` contains example human microelectrode array data, and data files output from the analysis and simulation procedures.
+
 See the README file in each directory for more details.
