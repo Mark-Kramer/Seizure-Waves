@@ -8,7 +8,7 @@
 %data_set = 'seizure';
 data_set = 'simulation';
 
-% Load the 
+% Load the data
 load(['../data/example_' data_set '_waves']);
 
 time = 1/fs * (0 : 1 : size(data,1) - 1);
