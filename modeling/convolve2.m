@@ -48,7 +48,7 @@ function y = convolve2(x, m, shape, tol)
 %  February 2002, revised January 2005.
 
 % Deal with optional arguments
-error(nargchk(2,4,nargin));
+narginchk(2,4);
 if nargin < 3
     shape = 'full';    % shape default as for CONV2
     tol = 0;

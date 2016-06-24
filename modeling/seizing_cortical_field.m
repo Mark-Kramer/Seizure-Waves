@@ -178,8 +178,8 @@ for i = 1: Nsteps
     
     %Save the "macroscale" dynamics.
     for ck=1:length(rEC)
-        QeEC(i,ck) = mean(mean(Qe_grid(rEC(ck)-2:rEC(ck)+2, cEC(ck)-2:cEC(ck)+2)));
-        VeEC(i,ck) = mean(mean(Ve_grid(rEC(ck)-2:rEC(ck)+2, cEC(ck)-2:cEC(ck)+2)));
+        QeEC(i,ck) = mean(mean(Qe_grid(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+        VeEC(i,ck) = mean(mean(Ve_grid(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
     end
     
     
