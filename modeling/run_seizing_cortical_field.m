@@ -122,8 +122,8 @@ fs = 1/dt;                                      %Define sampling frequency.
 %%%% Define the positions. ------------------------------------------------
 y = [-12, -12, -12,   0,  0,  0,  12, 12, 12];
 x = [-12,   0,  12, -12,  0, 12, -12,  0, 12];
-xy = [x;y]';
+position = [x;y]';
 
 %%%% Save the results. ----------------------------------------------------
 % NOTE: This file can be loaded and analyzed in analysis/main_seizure_wave.m
-save('../data/example_simulation_waves.mat', 'data', 'fs', 'xy')
+save('../data/example_simulation_waves.mat', 'data', 'fs', 'position')

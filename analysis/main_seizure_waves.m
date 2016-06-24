@@ -2,7 +2,15 @@
 % data: SAMPLES x ELECTRODES
 % fs: sampling rate
 % position: position of the electrodes in mm
-load('../data/example_seizure_waves');
+
+% Choose the data set to analyze, either:  seizure, or simulation.
+
+%data_set = 'seizure';
+data_set = 'simulation';
+
+% Load the 
+load(['../data/example_' data_set '_waves']);
+
 time = 1/fs * (0 : 1 : size(data,1) - 1);
 
 figure;
@@ -30,7 +38,7 @@ params.fpass = BAND;            % ... freq range to pass
 params.err = [1 0.05];          % ... theoretical error bars, p=0.05.
 
 [coh, phi, freq, coh_conf] = compute_coherence(data, params);
-save('../data/example_coherence', 'coh', 'phi', 'freq', 'coh_conf');
+save(['../data/example_' data_set '_coherence'], 'coh', 'phi', 'freq', 'coh_conf');
 
 figure;
 plot(freq, squeeze(coh(1,8,:)));

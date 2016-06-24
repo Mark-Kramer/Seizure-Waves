@@ -32,6 +32,7 @@ end
 if isnan(src_dir)
     fprintf('Unable to fit a plane to the delays in space\n');
 elseif nargin ==3 && strcmp(varargin{1}, 'plot')
+    figure
     scatter3(position(:,1), position(:,2), 1000 * delay, 200, 1000 * delay, 'filled');
     hold on    
     plot3(position(center,1), position(center,2), 0, 'X');
