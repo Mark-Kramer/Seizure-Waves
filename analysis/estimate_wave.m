@@ -1,6 +1,15 @@
 function [ src_dir, speed, ci_dir, ci_sp ] = estimate_wave( delay, position, varargin )
-%ESTIMATE_WAVE Summary of this function goes here
-%   Detailed explanation goes here
+%ESTIMATE_WAVE Tries to fit a plane to the delays between electrodes
+%organized in space based on their positions
+%   [SRC_DIR,SPEED,CI_DIR,CI_SP]=ESTIMATE_WAVE(DELAY,POSITION,VARARGIN)
+%   fits a plane to the DELAYs between all electrodes and the most central
+%   electrode based on the electrode POSITIONs in space. If there are
+%   enough electrodes with defined delays and the fit is significant, then
+%   the direction SRC_DIR toward the source of the wave propagation is 
+%   returned as well as the SPEED of the wave and confidence intervals
+%   around those values (CI_DIR, CI_SP).
+%   Optional: if the last input is 'plot', a representation of the delays
+%   at each electrode position with the fitted plan will be shown.
 
 P_THRESH = 0.05;                                                        % Threshold to accept/reject the fit
 MIN_RATIO_FINITE = 0.5;                                                 % we want 50% of electrodes to have a defined delay

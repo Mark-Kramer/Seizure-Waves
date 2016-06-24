@@ -1,6 +1,13 @@
 function [ delay, delay_ci_lo, delay_ci_up ] = compute_delay( coh, coh_conf, phi, freq )
-%COMPUTE_DELAY Summary of this function goes here
-%   Detailed explanation goes here
+%COMPUTE_DELAY Computes the delays between all pairs of electrodes 
+%   [DELAY,DELAY_CI_LO,DELAY_CI_UP] = COMPUTE_DELAY(COH,COH_CONF,PHI,FREQ) returns 
+%   the DELAY (NxN) matrix with delays between all pairs of N electrodes based on
+%   their phase PHI (NxN) at each frequency FREQ. Only phase where the
+%   coherence COH (NxN) is higher than the thrshold of significant conherence
+%   COH_CONF (NxN) are considered. The low boundary DELAY_CI_LO and upper 
+%   DELAY_CI_UP boundary of the delays are also returned.
+% 
+% See also DELAY_FROM_PHASE
 
 delay = zeros(size(coh,1));
 delay_ci_lo = zeros(size(coh,1));
@@ -23,9 +30,13 @@ end
 
 
 function [delay, delaylo, delayhi] = delay_from_phase(phi, freq)
-%INPUTS
-%  phi = phase of coherence at each freq.
-%  freq = frequency axis.
+%DELAY_FROM_PHASE Estimates the delay between two electrodes
+%   [DELAY,DELAYLO,DELAYHI]=DELAY_FROM_PHASE(PHI,FREQ) returns the DELAY
+%   between two electrodes based on their phase PHI at each frequency FREQ.
+%   This method is inspired by Gotman, J. (1983). Measurement of small time 
+%   differences between EEG channels: method and application to epileptic 
+%   seizure propagation. Electroencephalography and Clinical 
+%   Neurophysiology, 56(5), 501?514. 
 
     FREQ_INTERVAL = 3;      % we demand 3 Hz sequence of significant coherence to compute delay.
     PVALUE_THRESH = 0.05;   % threshold of the p-value for the linear fit

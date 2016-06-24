@@ -1,6 +1,13 @@
 function [ coh, phi, freq, coh_conf ] = compute_coherence( data, params )
-%COMPUTE_COHERENCE Summary of this function goes here
-%   Detailed explanation goes here
+%COMPUTE_COHERENCE Computes the coherence between electrodes using the
+%multitaper method
+%   [COH,PHI,FREQ,COH_CONF]=COMPUTE_COHERENCE(DATA,PARAMS) returns the
+%   coherence COH (NxNxF) and its phase PHI (NxNxF) for each pair of the N
+%   electrodes available in DATA (TxN) at each frequency FREQ (F) where T
+%   is the number of time samples. The confidence level at which the
+%   coherence is signficantly higher than 0 is also returned in COH_CONF.
+%   Parameters used for this computation are all defined in PARAMS (see the
+%   help from function coherencyc in Chronux)
 
 nb = size(data,1);
 nfft = max(2^(nextpow2(nb) + params.pad), nb);
