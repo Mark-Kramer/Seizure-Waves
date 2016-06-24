@@ -126,4 +126,4 @@ xy = [x;y]';
 
 %%%% Save the results. ----------------------------------------------------
 % NOTE: This file can be loaded and analyzed in analysis/main_seizure_wave.m
-save('example_simulation_waves.mat', 'data', 'fs', 'xy')
+save('../data/example_simulation_waves.mat', 'data', 'fs', 'xy')
