@@ -35,7 +35,7 @@
 clear; close all
 
 %%%% Set the output directory ---------------------------------------------
-OUTPUT_DIR = '~/research/MULTISCALE/dat/simulations/';  %<--- update this to make sense locally.
+OUTPUT_DIR = '../data/';  %<--- update this to make sense locally.
 
 %%%% Run the simulation. --------------------------------------------------
 T0 = 1;                                         %Simulate 1 s intervals.
@@ -68,10 +68,7 @@ end
 %% Cell B. Visualize the activity of the excitatory population. -----------
 %  NOTE:  This cell can be run after the Cell A is complete.
 
-clear; close all
-
-%%%% Set the output directory ---------------------------------------------
-OUTPUT_DIR = '~/research/MULTISCALE/dat/simulations/';  %<--- update this to make sense locally.
+clear -except OUTPUT_DIR; close all
 
 %%%% Visualize the excitatory population activity. ------------------------
 figure()
@@ -90,10 +87,7 @@ end
 %% Cell C. Create example 10 s of ECoG data to analyze wave dynamics.
 %  NOTE:  This cell can be run after the Cell A is complete.
 
-clear; close all
-
-%%%% Set the output directory ---------------------------------------------
-OUTPUT_DIR = '~/research/MULTISCALE/dat/simulations/';  %<--- update this to make sense locally.
+clear -except OUTPUT_DIR; close all
 
 %%%% Load 10 s of simulated ECoG and create a new data variable -----------
 K=10;                                           %# of intervals to load.
