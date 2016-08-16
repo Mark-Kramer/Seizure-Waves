@@ -13,4 +13,4 @@ The folder `data` contains example human microelectrode array data, and data fil
 
 See the README file in each directory for more details.
 
-This material is based upon work supported by the National Science Foundation under Grant Number 1451384.
+This material is based upon work supported by the National Science Foundation under Grant Number 1451384. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
