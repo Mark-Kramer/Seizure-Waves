@@ -12,3 +12,5 @@ The folder `modeling` contains MATLAB code to simulate the spatiotemporal dynami
 The folder `data` contains example human microelectrode array data, and data files output from the analysis and simulation procedures.
 
 See the README file in each directory for more details.
+
+This material is based upon work supported by the National Science Foundation under Grant Number 1451384.
