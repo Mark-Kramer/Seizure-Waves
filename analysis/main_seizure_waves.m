@@ -3,13 +3,14 @@
 % fs: sampling rate
 % position: position of the electrodes in mm
 
-% Choose the data set to analyze, either:  seizure, or simulation.
+% Choose the data set to analyze, either:  seizure, or from two simulation types.
 
-%data_set = 'seizure';
-data_set = 'simulation';
+%data_set = 'example_seizure_waves';                        %Example LFP data.
+data_set = 'example_simulation_waves_fixed_point_source';   %Example simulated data, fixed point source.
+%data_set = 'example_simulation_waves_ictal_wavefront';      %Example simulated data, ictal wavefront.
 
 % Load the data
-load(['../data/example_' data_set '_waves']);
+load(['../data/' data_set]);
 
 time = 1/fs * (0 : 1 : size(data,1) - 1);
 
