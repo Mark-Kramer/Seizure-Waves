@@ -2,6 +2,7 @@
 Run the function <b>run_seizing_cortical_field.m</b> to generate a simulation of a seizure.
 
 <ul>
+  <li> Two simulation scenarios are implemented which differ in the source of seizure activity: a fixed cortical source, and an ictal wavefront. 
   <li> The results are visualized as a series of maps, as in Figure 5c of the manuscript. </li>
   <li> A 10 s interval of the ECoG data are saved for wave analysis. </li>
 </ul>
