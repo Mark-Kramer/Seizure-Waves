@@ -12,6 +12,7 @@
 %
 %INPUTS
 %  source_del_VeRest = extra offest to resting potential at the source location (mV).
+%  map               = matrix of 2-dimensional locations of the source.
 %  time_end          = total time of simulation (/s).
 %  IC                = structure with initial conditions for model variables. 
 %                      There are two options:
@@ -35,7 +36,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %---------------------------------------------------------------------
-function [NP, EC, time, last] = seizing_cortical_field(source_del_VeRest, time_end, IC)
+function [NP, EC, time, last] = seizing_cortical_field(source_del_VeRest, map, time_end, IC)
 
 visualize_results = 1;   %Set this variable to 1 to create plots during simulation.
 
@@ -44,14 +45,15 @@ noise = 0.5;             %Noise level
 del_VeRest0 = 1;         %offset to resting potential of excitatory population (mV)
 del_ViRest0 = 0.1;       %offset to resting potential of inhibitry population (mV)
 
-%Parameters for proportion of extacellular ions
+%Parameters for proportion of extracellular potassium.
 K0 = 0;         %initial value.
 tau_K = 200;    %time-constant (/s).
 k_decay = 0.1;  %decay rate (/s).
 kD = 1;         %diffusion coefficient (cm^2/s).
 KtoVe = 10;     %impact on excitatory population resting voltage.
 KtoVi = 10;     %impact on inhibitory population resting voltage.
-KtoD  = -25;    %impact on inhibitory gap junction strength.
+KtoD  = -50;    %impact on inhibitory gap junction strength.
+kR    = 0.15;   %scale reaction term. 
     
 tau_dD  = 200;  %inhibitory gap junction time-constant (/s).
 tau_dVe = 250;  %excitatory population resting voltage time-constant (/s).
@@ -124,11 +126,25 @@ yNP = Ny/2;
 rEC = Nx/2 + [      -12, -12, -12,   0,  0,  0,  12, 12, 12]/3;
 cEC = Ny/2 + [      -12,   0,  12, -12,  0, 12, -12,  0, 12]/3;
 
-% Output variables.
-QeNP = zeros(Nsteps,3,3);
-VeNP = zeros(Nsteps,3,3);
-QeEC = zeros(Nsteps,length(rEC));
-VeEC = zeros(Nsteps,length(rEC));
+% Output variables for microscale, (*) denotes returned.
+ QeNP = zeros(Nsteps,3,3);              %Activity of excitatory population.   (*)
+ VeNP = zeros(Nsteps,3,3);              %Voltage  of excitatory population.   (*)
+ QiNP = zeros(Nsteps,3,3);              %Activity of inhibitory population.
+ ViNP = zeros(Nsteps,3,3);              %Voltage  of inhibitory population.
+  DNP = zeros(Nsteps,3,3);              %Inhibitory-to-inhibitory gap junction strength.
+  KNP = zeros(Nsteps,3,3);              %Extracellular potassium.
+ dVeNP= zeros(Nsteps,3,3);              %Change in resting voltage of excitatory population.
+ dViNP= zeros(Nsteps,3,3);              %Change in resting voltage of inhibitory population.
+
+% Output variables for macroscale, (*) denotes returned.
+ QeEC = zeros(Nsteps,length(rEC));      %Activity of excitatory population.   (*)
+ VeEC = zeros(Nsteps,length(rEC));      %Voltage  of excitatory population.   (*)
+ QiEC = zeros(Nsteps,length(rEC));      %Activity of inhibitory population.
+ ViEC = zeros(Nsteps,length(rEC));      %Voltage  of inhibitory population.
+  DEC = zeros(Nsteps,length(rEC));      %Inhibitory-to-inhibitory gap junction strength.
+  KEC = zeros(Nsteps,length(rEC));      %Extracellular potassium.
+ dVeEC= zeros(Nsteps,length(rEC));      %Change in resting voltage of excitatory population.
+ dViEC= zeros(Nsteps,length(rEC));      %Change in resting voltage of inhibitory population.
 
 %Use as initial conditions the "last" values of previous simulation.
 Qe_grid = IC.Qe;
@@ -166,35 +182,41 @@ B_ee = noise_sf * sqrt(noise_sc* HL.phi_ee_sc / dt);
 B_ei = noise_sf * sqrt(noise_sc* HL.phi_ei_sc / dt);
 
 for i = 1: Nsteps
-	
-% 	Qe(i,:) = Qe_grid(1:Nx, Ny/2)';
-%  	Ve(i,:) = Ve_grid(1:Nx, Ny/2)';
-%   Qi(i,:) = Qi_grid(1:Nx, Ny/2)';
-%  	Vi(i,:) = Vi_grid(1:Nx, Ny/2)';
 
     %Save the "microscale" dynamics.
-    QeNP(i,:,:) = Qe_grid(xNP-1:xNP+1, yNP-1:yNP+1);
-    VeNP(i,:,:) = Ve_grid(xNP-1:xNP+1, yNP-1:yNP+1);
+    QeNP(i,:,:) =    Qe_grid(xNP-1:xNP+1, yNP-1:yNP+1);
+    VeNP(i,:,:) =    Ve_grid(xNP-1:xNP+1, yNP-1:yNP+1);
+    QiNP(i,:,:) =    Qi_grid(xNP-1:xNP+1, yNP-1:yNP+1);
+    ViNP(i,:,:) =    Vi_grid(xNP-1:xNP+1, yNP-1:yNP+1);
+     DNP(i,:,:) =        D22(xNP-1:xNP+1, yNP-1:yNP+1);
+     KNP(i,:,:) =          K(xNP-1:xNP+1, yNP-1:yNP+1);
+   dVeNP(i,:,:) = del_VeRest(xNP-1:xNP+1, yNP-1:yNP+1);
+   dViNP(i,:,:) = del_ViRest(xNP-1:xNP+1, yNP-1:yNP+1);
     
     %Save the "macroscale" dynamics.
     for ck=1:length(rEC)
-        QeEC(i,ck) = mean(mean(Qe_grid(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
-        VeEC(i,ck) = mean(mean(Ve_grid(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
-    end
-    
+        QeEC(i,ck) = mean(mean(   Qe_grid(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+        VeEC(i,ck) = mean(mean(   Ve_grid(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+        QiEC(i,ck) = mean(mean(   Qi_grid(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+        ViEC(i,ck) = mean(mean(   Vi_grid(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+         DEC(i,ck) = mean(mean(       D22(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+         KEC(i,ck) = mean(mean(         K(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+       dVeEC(i,ck) = mean(mean(del_VeRest(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+       dViEC(i,ck) = mean(mean(del_ViRest(rEC(ck)-1:rEC(ck)+1, cEC(ck)-2:cEC(ck)+1)));
+    end    
     
 % 1. update wave equations
     phi2_ee_1 = zeros(Nx,Ny);
-    phi2_ee_1(2:Nx-1,2:Ny-1) = phi2_ee(2:Nx-1,2:Ny-1) + dt*(-2*HL.v*HL.Lambda*phi2_ee(2:Nx-1,2:Ny-1) ...
-                             - (HL.v*HL.Lambda).^2*phi_ee(2:Nx-1,2:Ny-1) ...
-                             + (HL.v*HL.Lambda).^2*Qe_grid(2:Nx-1,2:Ny-1))...
+    phi2_ee_1(2:Nx-1,2:Ny-1) = phi2_ee(2:Nx-1,2:Ny-1) + dt*(-2*HL.v.*HL.Lambda.*phi2_ee(2:Nx-1,2:Ny-1) ...
+                             - (HL.v.*HL.Lambda).^2.*phi_ee(2:Nx-1,2:Ny-1) ...
+                             + (HL.v.*HL.Lambda).^2.*Qe_grid(2:Nx-1,2:Ny-1))...
                              + dt*(HL.v/dx)^2*convolve2(phi_ee, Laplacian, 'valid');
     phi_ee_1 = phi_ee + dt*phi2_ee;
 
     phi2_ei_1 = zeros(Nx,Ny);
-    phi2_ei_1(2:Nx-1,2:Ny-1) = phi2_ei(2:Nx-1,2:Ny-1) + dt*(-2*HL.v*HL.Lambda*phi2_ei(2:Nx-1,2:Ny-1) ...
-                             - (HL.v*HL.Lambda).^2*phi_ei(2:Nx-1,2:Ny-1) ...
-                             + (HL.v*HL.Lambda).^2*Qe_grid(2:Nx-1,2:Ny-1)) ...
+    phi2_ei_1(2:Nx-1,2:Ny-1) = phi2_ei(2:Nx-1,2:Ny-1) + dt*(-2*HL.v.*HL.Lambda.*phi2_ei(2:Nx-1,2:Ny-1) ...
+                             - (HL.v.*HL.Lambda).^2.*phi_ei(2:Nx-1,2:Ny-1) ...
+                             + (HL.v.*HL.Lambda).^2.*Qe_grid(2:Nx-1,2:Ny-1)) ...
                              + dt*(HL.v/dx)^2*convolve2(phi_ei, Laplacian, 'valid');
     phi_ei_1 = phi_ei + dt*phi2_ei;
 
@@ -251,10 +273,10 @@ for i = 1: Nsteps
     K_1(2:Nx-1,2:Ny-1) =    K(2:Nx-1,2:Ny-1) ...
                             + dt/tau_K*(-k_decay*K(2:Nx-1,2:Ny-1) ...   % decay term.
                             ...                                         % reaction term.
-                            + (Qe_grid(2:Nx-1,2:Ny-1) + Qi_grid(2:Nx-1,2:Ny-1))./(1+exp(-((Qe_grid(2:Nx-1,2:Ny-1) + Qi_grid(2:Nx-1,2:Ny-1))-15))) ...
-                            + kD*convolve2(K, Laplacian, 'valid'));     % diffusion term.
+                            + kR* (Qe_grid(2:Nx-1,2:Ny-1) + Qi_grid(2:Nx-1,2:Ny-1))./(1+exp(-((Qe_grid(2:Nx-1,2:Ny-1) + Qi_grid(2:Nx-1,2:Ny-1))-15))) ...
+                            + kD* convolve2(K, Laplacian, 'valid'));     % diffusion term.
 
-% 6. Update inhibitory gap junction junction strength, and resting voltages.               
+% 6. Update inhibitory gap junction strength, and resting voltages.               
     D22_1         = D22        + dt/tau_dD *(KtoD *K);
     del_VeRest_1  = del_VeRest + dt/tau_dVe*(KtoVe*K);
     del_ViRest_1  = del_ViRest + dt/tau_dVi*(KtoVi*K);
@@ -283,16 +305,11 @@ for i = 1: Nsteps
 
     del_VeRest = min(del_VeRest_1,1.5);     %The excitatory population resting voltage cannot pass above a maximum value of 1.5.
     
-    %Set the "source" locations' excitatory population resting voltage
-    del_VeRest(Nx/4*1, Ny/4-1)   = source_del_VeRest;
-    del_VeRest(Nx/4*1-1, Ny/4-1) = source_del_VeRest;
-    del_VeRest(Nx/4*1+1, Ny/4-1) = source_del_VeRest;
-    del_VeRest(Nx/4*1, Ny/4-2)   = source_del_VeRest;
-    del_VeRest(Nx/4*1, Ny/4)     = source_del_VeRest;
-    del_VeRest(Nx/4*1-1, Ny/4-2) = source_del_VeRest;
-    del_VeRest(Nx/4*1+1, Ny/4)   = source_del_VeRest;
-    del_VeRest(Nx/4*1-1, Ny/4)   = source_del_VeRest;
-    del_VeRest(Nx/4*1+1, Ny/4-2) = source_del_VeRest;
+%%%%  Set the "source" locations' excitatory population resting voltage
+    ind = find(map==1);
+    for k=1:length(ind)
+        del_VeRest(ind(k)) = source_del_VeRest;
+    end
 
     del_ViRest = min(del_ViRest_1,0.8);     %The inhibitory population resting voltage cannot pass above a maximum value of 0.8.
     K = min(K_1,1);                         %The extracellular ion cannot pass above a maximum value of 1.0.
