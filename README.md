@@ -3,7 +3,7 @@ Analysis and modeling code for waves of seizure activity.
 
 This repository contains examples of the data analysis and modeling methods developed in:
 
-<i>L.-E. Martinet et al, <a href="https://www.nature.com/articles/ncomms14896">Human seizures couple across spatial scales through traveling wave dynamics</a>, Nature Communications 8, 14896 (2017).
+<i>L.-E. Martinet et al, <a href="https://www.nature.com/articles/ncomms14896">Human seizures couple across spatial scales through traveling wave dynamics</a>, Nature Communications 8, 14896 (2017).</i>
 
 The folder `analysis` contains MATLAB code to estimate the direction and speed of a traveling wave from a multielectrode recordings.
 
