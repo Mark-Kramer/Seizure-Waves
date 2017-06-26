@@ -1,7 +1,7 @@
 function [map,state] = make_map(map_type,k,varargin)
 
   if strcmp(map_type, 'fixed_point_source')
-      [Nx Ny] = deal(100);
+      [Nx, Ny] = deal(100);
       map = zeros(Nx,Ny);
       
       %center of initial state.
@@ -25,7 +25,7 @@ function [map,state] = make_map(map_type,k,varargin)
   if strcmp(map_type, 'ictal_wavefront')
       
       shrink_factor = 0.5;
-      [Nx Ny] = deal(100);
+      [Nx, Ny] = deal(100);
       state = varargin{1};
       if k==0
           %center of initial map.
@@ -45,7 +45,7 @@ function [map,state] = make_map(map_type,k,varargin)
           state(xCenter+1, yCenter+1) = 1;
       end
           
-      if k>40 && mod(k,3)==0;  %mod(k,4)==0       Every 3 s, step ~3 mm = 1 mm/s.
+      if k>40 && mod(k,3)==0  %mod(k,4)==0       Every 3 s, step ~3 mm = 1 mm/s.
           [r,c] = find(state);
           B = boundary(c,r,shrink_factor);
           % For each point on the boundary,

@@ -60,7 +60,7 @@ tau_dVe = 250;  %excitatory population resting voltage time-constant (/s).
 tau_dVi = 250;  %inhibitory population resting voltage time-constant (/s).
 
 % set no. of sampling points (must be even!) along each axis of cortical grid
-[Nx Ny] = deal(100);
+[Nx, Ny] = deal(100);
 
 del_VeRest = zeros(Nx,Ny)+del_VeRest0;	%Set initial excitatory resting potential offset in all space (mV)
 del_ViRest = zeros(Nx,Ny)+del_ViRest0;  %Set initial inhibitory resting potential offset in all space (mV)
@@ -78,7 +78,7 @@ rho_i = HL.gi;
 
 % initialize random number generator (from input argument)
 rand_state = sum(100*clock);
-randn('state', rand_state);
+rng(rand_state, 'v5normal');
 
 noise_sf = 0.2*20*noise;    % noise scale-factor
 noise_sc = 0.2;             % subcortical noise
@@ -91,8 +91,8 @@ HL.tau_e = 0.02;			% excit neuron time-constant (/s) [original = 0.04 s]
 HL.tau_i = 0.02;			% inhib neuron time-constant (/s) [original = 0.04 s]
 
 % dimensions for the cortical grid
-[Lx Ly] = deal(30);             % square cortex (cm)
-[dx dy] = deal(Lx/Nx, Ly/Ny);   % spatial resolution (cm)
+[Lx, Ly] = deal(30);             % square cortex (cm)
+[dx, dy] = deal(Lx/Nx, Ly/Ny);   % spatial resolution (cm)
 
 % set time resolution
 if D2 < 0.87
@@ -101,13 +101,13 @@ else
 	dt = 0.2*1e-3;
 end
 
-if HL.v > 140;
+if HL.v > 140
     dt = 0.2*1e-3;
 end
 
 % number of time-steps for simulation
 Nsteps = round(time_end/dt);
-time   = [0:Nsteps-1]'*dt;
+time   = (0:Nsteps-1)'*dt;
 
 % 3x3 Laplacian matrix (used in grid convolution calculations)
 Laplacian = [0 1 0; 1 -4 1; 0 1 0];
@@ -425,9 +425,9 @@ del_ViRest(:,Ny) = del_ViRest(:,Ny-1);
               
               % Indicate electrode positions.
               hold on
-              plot([xNP-1:xNP+1], [yNP-1], '*k')
-              plot([xNP-1:xNP+1], [yNP],   '*k')
-              plot([xNP-1:xNP+1], [yNP+1], '*k')
+              plot(xNP-1:xNP+1, yNP-1, '*k')
+              plot(xNP-1:xNP+1, yNP,   '*k')
+              plot(xNP-1:xNP+1, yNP+1, '*k')
               for ck=1:length(rEC)
                   plot([rEC(ck)-2, rEC(ck)+2, rEC(ck)+2, rEC(ck)-2, rEC(ck)-2], ...
                       [cEC(ck)-2, cEC(ck)-2, cEC(ck)+2, cEC(ck)+2, cEC(ck)-2])
